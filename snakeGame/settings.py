@@ -1,3 +1,5 @@
+from random import randrange
+
 TILE_SIZE = 100
 ROWS = 10
 COLS = 10
@@ -6,5 +8,5 @@ WINDOW_HEIGHT = COLS * TILE_SIZE
 
 # start position
 START_LENGTH = 3
-START_ROW = ROWS // 2
-START_COL = START_LENGTH + 2
+START_ROW = randrange(0, ROWS, 1)
+START_COL = randrange(2, COLS, 1)

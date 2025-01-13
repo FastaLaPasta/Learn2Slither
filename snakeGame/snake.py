@@ -1,34 +1,75 @@
-from settings import START_LENGTH, START_COL, START_ROW, TILE_SIZE
+from settings import TILE_SIZE, ROWS, COLS
 import pygame as pg
+from random import randrange
 
 
 class Snake:
     def __init__(self):
         self.screen = pg.display.get_surface()
-        self.body = [pg.Vector2(START_COL - col, START_ROW)
-                     for col in range(START_LENGTH)]
-        self.direction = pg.Vector2(1, 0)
+        self.body = []
+        self.direction = pg.Vector2()
 
-        self.has_eaten = False
+        self.has_eaten_green = False
+        self.has_eaten_red = False
+        self.lose_by_length = False
+        self.create_snake()
 
     def update(self):
-        if not self.has_eaten:
-            body_copy = self.body[:-1]
+        if not self.has_eaten_green and not self.has_eaten_red:
+            body_copy = self.body
             body_copy.insert(0, body_copy[0] + self.direction)
+            body_copy = self.body[:-1]
             self.body = body_copy[:]
-        else:
+        elif self.has_eaten_green:
             body_copy = self.body[:]
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
-            self.has_eaten = False
+            self.has_eaten_green = False
+        else:
+            body_copy = self.body
+            body_copy.insert(0, body_copy[0] + self.direction)
+            body_copy = self.body[:-2]
+            self.body = body_copy[:]
+            self.has_eaten_red = False
+            if len(body_copy) == 0:
+                self.lose_by_length = True
+
+    def create_snake(self):
+        head_pos = pg.Vector2(randrange(2, COLS, 1), randrange(0, ROWS, 1))
+        self.body.append(head_pos)
+
+        for _ in range(2):
+            while True:
+                direction = randrange(4)
+                if direction == 0:
+                    x_pos = int(self.body[-1].x) - 1
+                    y_pos = int(self.body[-1].y)
+                elif direction == 1:
+                    x_pos = int(self.body[-1].x) + 1
+                    y_pos = int(self.body[-1].y)
+                elif direction == 2:
+                    x_pos = int(self.body[-1].x)
+                    y_pos = int(self.body[-1].y) - 1
+                elif direction == 3:
+                    x_pos = int(self.body[-1].x)
+                    y_pos = int(self.body[-1].y) + 1
+                if 0 <= x_pos < COLS and 0 <= y_pos < ROWS:
+                    new_pos = pg.Vector2(x_pos, y_pos)
+                    if new_pos not in self.body:
+                        self.body.append(new_pos)
+                        break
 
     def reset(self):
-        self.body = [pg.Vector2(START_COL - col, START_ROW)
-                     for col in range(START_LENGTH)]
-        self.direction = pg.Vector2(1, 0)
+        self.body = []
+        self.create_snake()
+        self.direction = pg.Vector2()
+        self.lose_by_length = False
 
     def draw(self):
         for point in self.body:
             rect = pg.Rect(point.x * TILE_SIZE, point.y * TILE_SIZE,
                            TILE_SIZE, TILE_SIZE)
-            pg.draw.rect(self.screen, 'red', rect)
+            if point is self.body[0]:
+                pg.draw.rect(self.screen, 'darkblue', rect)
+            else:
+                pg.draw.rect(self.screen, 'blue', rect)
