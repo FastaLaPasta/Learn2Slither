@@ -71,6 +71,7 @@ class game():
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
+                    self.snake.update_vision(self.occupied, self.redApple)
                     pg.quit()
                     exit()
                 if event.type == self.update_event and self.game_active:

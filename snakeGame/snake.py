@@ -73,3 +73,30 @@ class Snake:
                 pg.draw.rect(self.screen, 'darkblue', rect)
             else:
                 pg.draw.rect(self.screen, 'blue', rect)
+
+    def update_vision(self, occupied, r_apple):
+        vision_matrix = [[" " for column in range(12)] for row in range(12)]
+        
+        head_y = int(self.body[0].y)
+        head_x = int(self.body[0].x)
+
+        vision_matrix[head_y][head_x] = 'H'
+
+        for i in range(12):
+            if pg.Vector2(i, head_y) != pg.Vector2(head_x, head_y):
+                vision_matrix[head_y][i] = '0'
+                for apple in occupied:
+                    if pg.Vector2(i, head_y) == apple.pos and apple.pos != r_apple.pos:
+                        vision_matrix[head_y][i] = 'G'
+                    elif pg.Vector2(i, head_y) == r_apple.pos:
+                        vision_matrix[head_y][i] = 'R'
+            if pg.Vector2(head_x, i) != pg.Vector2(head_x, head_y):
+                vision_matrix[i][head_x] = '0'
+                for apple in occupied:
+                    if pg.Vector2(head_x, i) == apple.pos and apple.pos != r_apple.pos:
+                        vision_matrix[i][head_x] = 'G'
+                    elif pg.Vector2(head_x, i) == r_apple.pos:
+                        vision_matrix[i][head_x] = 'R'
+
+        for row in vision_matrix:
+            print("".join(row))
