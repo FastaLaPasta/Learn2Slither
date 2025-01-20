@@ -14,7 +14,7 @@ class Snake:
         self.lose_by_length = False
         self.create_snake()
 
-    def update(self):
+    def update(self, occupied, redApple):
         if not self.has_eaten_green and not self.has_eaten_red:
             body_copy = self.body
             body_copy.insert(0, body_copy[0] + self.direction)
@@ -33,6 +33,8 @@ class Snake:
             self.has_eaten_red = False
             if len(body_copy) == 0:
                 self.lose_by_length = True
+        if not self.lose_by_length:
+            self.update_vision(occupied, redApple)
 
     def create_snake(self):
         head_pos = pg.Vector2(randrange(2, COLS, 1), randrange(0, ROWS, 1))
@@ -75,31 +77,38 @@ class Snake:
                 pg.draw.rect(self.screen, 'blue', rect)
 
     def update_vision(self, occupied, r_apple):
-        vision_matrix = [[" " for column in range(11)] for row in range(11)]
-        
-        head_y = int(self.body[0].y)
-        head_x = int(self.body[0].x)
-
+        vision_matrix = [[" " for column in range(12)] for row in range(12)]
+        head_y = int(self.body[0].y) + 1
+        head_x = int(self.body[0].x) + 1
         vision_matrix[head_y][head_x] = 'H'
-        vision_matrix[head_y][0] = 'W'
-        vision_matrix[head_y][-1] = 'W'
+
         vision_matrix[0][head_x] = 'W'
-        vision_matrix[-1][head_x] = 'W'
-        for i in range(1, len(vision_matrix) - 1):
-            if pg.Vector2(i, head_y) != pg.Vector2(head_x, head_y):
+        vision_matrix[11][head_x] = 'W'
+        vision_matrix[head_y][0] = 'W'
+        vision_matrix[head_y][11] = 'W'
+
+        for i in range(1, 11):
+            if pg.Vector2(i - 1, head_y - 1) != pg.Vector2(head_x - 1, head_y - 1):
                 vision_matrix[head_y][i] = '0'
                 for apple in occupied:
-                    if pg.Vector2(i, head_y) == apple.pos and apple.pos != r_apple.pos:
+                    if pg.Vector2(i - 1, head_y - 1) == apple.pos \
+                            and apple.pos != r_apple.pos:
                         vision_matrix[head_y][i] = 'G'
-                    elif pg.Vector2(i, head_y) == r_apple.pos:
+                    elif pg.Vector2(i - 1, head_y - 1) == r_apple.pos:
                         vision_matrix[head_y][i] = 'R'
-            if pg.Vector2(head_x, i) != pg.Vector2(head_x, head_y):
+                if pg.Vector2(i - 1, head_y - 1) in self.body:
+                    vision_matrix[head_y][i] = 'S'
+            if pg.Vector2(head_x - 1, i - 1) != pg.Vector2(head_x - 1, head_y - 1):
                 vision_matrix[i][head_x] = '0'
                 for apple in occupied:
-                    if pg.Vector2(head_x, i) == apple.pos and apple.pos != r_apple.pos:
+                    if pg.Vector2(head_x - 1, i - 1) == apple.pos \
+                            and apple.pos != r_apple.pos:
                         vision_matrix[i][head_x] = 'G'
-                    elif pg.Vector2(head_x, i) == r_apple.pos:
+                    elif pg.Vector2(head_x - 1, i - 1) == r_apple.pos:
                         vision_matrix[i][head_x] = 'R'
+                if pg.Vector2(head_x - 1, i - 1) in self.body:
+                    vision_matrix[i][head_x] = 'S'
 
+        # Print the vision matrix
         for row in vision_matrix:
             print("".join(row))
