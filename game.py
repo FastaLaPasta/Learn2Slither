@@ -2,10 +2,7 @@ from settings import WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE, COLS, ROWS
 import pygame as pg
 from snake import Snake
 from apple import GreenApple, RedApple
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from agent.agent import Agent
+from agent import Agent
 
 
 class game():
@@ -27,7 +24,7 @@ class game():
 
         # timer
         self.update_event = pg.event.custom_type()
-        pg.time.set_timer(self.update_event, 50)
+        pg.time.set_timer(self.update_event, 110)
         self.game_active = False
 
     def draw_bg(self):
@@ -51,15 +48,18 @@ class game():
         for apple in self.occupied:
             apple.set_pos()
         self.snake.update_vision(self.occupied, self.redApple)
+        self.agent.reward = 0
 
     def collision(self):
         # game over
         if self.snake.lose_by_length:
+            self.agent.reward -= 10
             self.respawn()
             self.game_active = True
         elif (not 0 <= self.snake.body[0].x < COLS or
               not 0 <= self.snake.body[0].y < ROWS or
                 self.snake.body[0] in self.snake.body[1:]):
+            self.agent.reward -= 10
             self.respawn()
             self.game_active = True
 
@@ -67,11 +67,14 @@ class game():
         for apple in self.greenApples:
             if self.snake.body[0] == apple.pos:
                 self.snake.has_eaten_green = True
+                self.agent.reward += 10
                 apple.set_pos()
 
         if self.snake.body[0] == self.redApple.pos:
             self.snake.has_eaten_red = True
+            self.agent.reward -= 5
             self.redApple.set_pos()
+        self.agent.reward -= 0.5
 
     def play(self):
         while True:
@@ -83,6 +86,7 @@ class game():
                     self.input(self.agent.movement())
                     self.snake.update(self.occupied, self.redApple)
                     self.collision()
+                    print(self.agent.reward)
 
                 if event.type == pg.KEYDOWN and not self.game_active:
                     self.game_active = True
