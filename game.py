@@ -14,13 +14,14 @@ class game():
         self.bg_rect = [pg.Rect((col + int(row % 2 == 0)) * TILE_SIZE,
                                 row * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                         for col in range(0, 10, 2) for row in range(10)]
-        self.agent = Agent()
         self.snake = Snake()
+        self.agent = Agent(self.snake)
         self.greenApples = [GreenApple(self.snake) for i in range(2)]
         self.redApple = RedApple(self.snake, self.greenApples)
         self.occupied = self.greenApples + [self.redApple]
         for apple in self.greenApples:
             apple.get_occupied_tile(self.occupied)
+        self.snake.update_vision(self.occupied, self.redApple)
 
         # timer
         self.update_event = pg.event.custom_type()
@@ -86,7 +87,6 @@ class game():
                     self.input(self.agent.movement())
                     self.snake.update(self.occupied, self.redApple)
                     self.collision()
-                    print(self.agent.reward)
 
                 if event.type == pg.KEYDOWN and not self.game_active:
                     self.game_active = True

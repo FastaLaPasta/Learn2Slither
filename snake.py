@@ -12,6 +12,7 @@ class Snake:
         self.has_eaten_green = False
         self.has_eaten_red = False
         self.lose_by_length = False
+        self.state = [0] * 21
         self.create_snake()
 
     def update(self, occupied, redApple):
@@ -108,7 +109,43 @@ class Snake:
                         vision_matrix[i][head_x] = 'R'
                 if pg.Vector2(head_x - 1, i - 1) in self.body:
                     vision_matrix[i][head_x] = 'S'
-
+        self.state = self.get_state(vision_matrix)
         # Print the vision matrix
         for row in vision_matrix:
             print("".join(row))
+
+    def get_state(self, vision_matrix):
+        head_y = int(self.body[0].y) + 1
+        head_x = int(self.body[0].x) + 1
+
+        # wall distance = 4 / body distance = 4/ good apple 1 et 2 = 8
+        # direction = 1 et bad apple =4 donc 21
+        def update_state(primary_index, secondary_index, value):
+            if self.state[primary_index] == 0:
+                self.state[primary_index] = value
+            elif self.state[secondary_index] == 0:
+                self.state[secondary_index] = value
+
+        # Check horizontally (left-right)
+        for x in range(len(vision_matrix[0])):
+            dist = abs(head_x - x)
+            if vision_matrix[head_y][x] == 'W':
+                self.state[1 if head_x < x else 3] = dist
+            elif vision_matrix[head_y][x] == 'S':
+                self.state[5 if head_x < x else 7] = dist
+            elif vision_matrix[head_y][x] == 'G':
+                update_state(9 if head_x < x else 11, 13 if head_x < x else 15, dist)
+            elif vision_matrix[head_y][x] == 'R':
+                self.state[17 if head_x < x else 19] = dist
+
+        # Check vertically (up-down)
+        for y in range(len(vision_matrix)):
+            dist = abs(head_y - y)
+            if vision_matrix[y][head_x] == 'W':
+                self.state[2 if head_y < y else 0] = dist
+            elif vision_matrix[y][head_x] == 'S':
+                self.state[6 if head_y < y else 4] = dist
+            elif vision_matrix[y][head_x] == 'G':
+                update_state(10 if head_y < y else 8, 14 if head_y < y else 12, dist)
+            elif vision_matrix[y][head_x] == 'R':
+                self.state[18 if head_y < y else 16] = dist
