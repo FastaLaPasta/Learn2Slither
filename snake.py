@@ -110,7 +110,6 @@ class Snake:
                 if pg.Vector2(head_x - 1, i - 1) in self.body:
                     vision_matrix[i][head_x] = 'S'
         self.get_state(vision_matrix)
-        # Print the vision matrix
         for row in vision_matrix:
             print("".join(row))
 
@@ -123,12 +122,14 @@ class Snake:
         # wall distance = 4 / body distance = 4/ good apple 1 et 2 = 8
         # direction = 1 et bad apple =4 donc 21
         def update_state(primary_index, secondary_index, value):
-            if self.state[primary_index] == 0:
-                print(primary_index)
-                self.state[primary_index] = value
-            elif self.state[secondary_index] == 0:
-                print(secondary_index)
+            green_apple_found = False
+            for i in range(8, 12):
+                if self.state[i] != 0:
+                    green_apple_found = True
+            if green_apple_found is True:
                 self.state[secondary_index] = value
+            else:
+                self.state[primary_index] = value
 
         # Check horizontally (left-right)
         for x in range(len(vision_matrix[0])):
@@ -138,7 +139,6 @@ class Snake:
             elif vision_matrix[head_y][x] == 'S':
                 self.state[5 if head_x < x else 7] = dist
             elif vision_matrix[head_y][x] == 'G':
-                print(f'find {head_y} and {x}')
                 update_state(9 if head_x < x else 11, 13 if head_x < x else 15, dist)
             elif vision_matrix[head_y][x] == 'R':
                 self.state[17 if head_x < x else 19] = dist
@@ -149,9 +149,19 @@ class Snake:
             if vision_matrix[y][head_x] == 'W':
                 self.state[2 if head_y < y else 0] = dist
             elif vision_matrix[y][head_x] == 'S':
-                self.state[6 if head_y < y else 4] = dist
+                if dist < self.state[6 if head_y < y else 4] or self.state[6 if head_y < y else 4] == 0:
+                    self.state[6 if head_y < y else 4] = dist
             elif vision_matrix[y][head_x] == 'G':
-                print(f'find {head_x} and {y}')
                 update_state(10 if head_y < y else 8, 14 if head_y < y else 12, dist)
             elif vision_matrix[y][head_x] == 'R':
                 self.state[18 if head_y < y else 16] = dist
+
+        if self.direction == pg.Vector2(0, -1):
+            self.state[20] = 1
+        elif self.direction == pg.Vector2(1, 0):
+            self.state[20] = 2
+        elif self.direction == pg.Vector2(0, 1):
+            self.state[20] = 3
+        elif self.direction == pg.Vector2(-1, 0):
+            self.state[20] = 4
+        print(self.state)

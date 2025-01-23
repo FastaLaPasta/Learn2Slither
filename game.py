@@ -25,7 +25,7 @@ class game():
 
         # timer
         self.update_event = pg.event.custom_type()
-        pg.time.set_timer(self.update_event, 300)
+        pg.time.set_timer(self.update_event, 110)
         self.game_active = False
 
     def draw_bg(self):
@@ -34,23 +34,24 @@ class game():
             pg.draw.rect(self.screen, 'darkgrey', rect)
 
     def input(self, movement):
-        keys = pg.key.get_pressed()
-        if keys[pg.K_d] and self.snake.direction.x != -1:
-            self.snake.direction = pg.Vector2(1, 0)
-        if keys[pg.K_a] and self.snake.direction.x != 1:
-            self.snake.direction = pg.Vector2(-1, 0)
-        if keys[pg.K_w] and self.snake.direction.y != 1:
-            self.snake.direction = pg.Vector2(0, -1)
-        if keys[pg.K_s] and self.snake.direction.y != -1:
-            self.snake.direction = pg.Vector2(0, 1)
-        # if movement == 'RIGHT' and self.snake.direction.x != -1:
+        # keys = pg.key.get_pressed()
+        # if keys[pg.K_d] and self.snake.direction.x != -1:
         #     self.snake.direction = pg.Vector2(1, 0)
-        # if movement == 'LEFT' and self.snake.direction.x != 1:
+        # if keys[pg.K_a] and self.snake.direction.x != 1:
         #     self.snake.direction = pg.Vector2(-1, 0)
-        # if movement == 'UP' and self.snake.direction.y != 1:
+        # if keys[pg.K_w] and self.snake.direction.y != 1:
         #     self.snake.direction = pg.Vector2(0, -1)
-        # if movement == 'DOWN' and self.snake.direction.y != -1:
+        # if keys[pg.K_s] and self.snake.direction.y != -1:
         #     self.snake.direction = pg.Vector2(0, 1)
+        if movement == 'RIGHT' and self.snake.direction.x != -1:
+            self.snake.direction = pg.Vector2(1, 0)
+        if movement == 'LEFT' and self.snake.direction.x != 1:
+            self.snake.direction = pg.Vector2(-1, 0)
+        if movement == 'UP' and self.snake.direction.y != 1:
+            self.snake.direction = pg.Vector2(0, -1)
+        if movement == 'DOWN' and self.snake.direction.y != -1:
+            self.snake.direction = pg.Vector2(0, 1)
+        print(movement)
 
     def respawn(self):
         self.snake.reset()
@@ -92,14 +93,14 @@ class game():
                     pg.quit()
                     exit()
                 if event.type == self.update_event and self.game_active:
-                    print(self.snake.state)
+                    self.input(self.agent.movement())
                     self.snake.update(self.occupied, self.redApple)
                     self.collision()
 
                 if event.type == pg.KEYDOWN and not self.game_active:
                     self.game_active = True
             # drawing
-            self.input(self.agent.movement())
+            
             self.draw_bg()
             self.snake.draw()
             for apple in self.greenApples:
