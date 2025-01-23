@@ -109,7 +109,7 @@ class Snake:
                         vision_matrix[i][head_x] = 'R'
                 if pg.Vector2(head_x - 1, i - 1) in self.body:
                     vision_matrix[i][head_x] = 'S'
-        self.state = self.get_state(vision_matrix)
+        self.get_state(vision_matrix)
         # Print the vision matrix
         for row in vision_matrix:
             print("".join(row))
@@ -118,12 +118,16 @@ class Snake:
         head_y = int(self.body[0].y) + 1
         head_x = int(self.body[0].x) + 1
 
+        self.state = [0] * 21
+
         # wall distance = 4 / body distance = 4/ good apple 1 et 2 = 8
         # direction = 1 et bad apple =4 donc 21
         def update_state(primary_index, secondary_index, value):
             if self.state[primary_index] == 0:
+                print(primary_index)
                 self.state[primary_index] = value
             elif self.state[secondary_index] == 0:
+                print(secondary_index)
                 self.state[secondary_index] = value
 
         # Check horizontally (left-right)
@@ -134,6 +138,7 @@ class Snake:
             elif vision_matrix[head_y][x] == 'S':
                 self.state[5 if head_x < x else 7] = dist
             elif vision_matrix[head_y][x] == 'G':
+                print(f'find {head_y} and {x}')
                 update_state(9 if head_x < x else 11, 13 if head_x < x else 15, dist)
             elif vision_matrix[head_y][x] == 'R':
                 self.state[17 if head_x < x else 19] = dist
@@ -146,6 +151,7 @@ class Snake:
             elif vision_matrix[y][head_x] == 'S':
                 self.state[6 if head_y < y else 4] = dist
             elif vision_matrix[y][head_x] == 'G':
+                print(f'find {head_x} and {y}')
                 update_state(10 if head_y < y else 8, 14 if head_y < y else 12, dist)
             elif vision_matrix[y][head_x] == 'R':
                 self.state[18 if head_y < y else 16] = dist

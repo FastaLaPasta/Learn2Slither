@@ -12,7 +12,7 @@ class Agent:
         self.snake = snake
 
     def movement(self):
-        print(self.snake.direction, self.snake.state)
+        # print(self.snake.direction, self.snake.state)
         if self.snake.direction.x == -1:
             return random.choice(['UP', 'RIGHT', 'DOWN'])
         elif self.snake.direction.x == 1:
