@@ -12,7 +12,7 @@ class Snake:
         self.has_eaten_green = False
         self.has_eaten_red = False
         self.lose_by_length = False
-        self.state = [0] * 21
+        self.state = [0] * 12
         self.create_snake()
 
     def update(self, occupied, redApple):
@@ -113,55 +113,116 @@ class Snake:
         for row in vision_matrix:
             print("".join(row))
 
+    # def update_state(self, r_b, r_end, primary_index, secondary_index, value):
+    #     green_apple_found = False
+    #     for i in range(r_b, r_end):
+    #         if self.state[i] != 0:
+    #             green_apple_found = True
+    #     if green_apple_found is True:
+    #         self.state[secondary_index] = value
+    #     else:
+    #         self.state[primary_index] = value
+
     def get_state(self, vision_matrix):
         head_y = int(self.body[0].y) + 1
         head_x = int(self.body[0].x) + 1
+        self.state = [0] * 12
 
-        self.state = [0] * 21
+        for x in range(head_x + 1, len(vision_matrix[0])):
+            if vision_matrix[head_y][x] == 'W' or vision_matrix[head_y][x] == 'S':
+                self.state[1] = 1
+                break
+            elif vision_matrix[head_y][x] == 'G' or vision_matrix[head_y][x] == 'R':
+                self.state[0] = 1
+                break
+            elif vision_matrix[head_y][x] == '0':
+                self.state[2] = 1
 
-        # wall distance = 4 / body distance = 4/ good apple 1 et 2 = 8
-        # direction = 1 et bad apple =4 donc 21
-        def update_state(primary_index, secondary_index, value):
-            green_apple_found = False
-            for i in range(8, 12):
-                if self.state[i] != 0:
-                    green_apple_found = True
-            if green_apple_found is True:
-                self.state[secondary_index] = value
-            else:
-                self.state[primary_index] = value
+        for x in range(head_x - 1, -1, -1):
+            if vision_matrix[head_y][x] == 'W' or vision_matrix[head_y][x] == 'S':
+                self.state[4] = 1
+                break
+            elif vision_matrix[head_y][x] == 'G' or vision_matrix[head_y][x] == 'R':
+                self.state[3] = 1
+                break
+            elif vision_matrix[head_y][x] == '0':
+                self.state[5] = 1
 
-        # Check horizontally (left-right)
-        for x in range(len(vision_matrix[0])):
-            dist = abs(head_x - x)
-            if vision_matrix[head_y][x] == 'W':
-                self.state[1 if head_x < x else 3] = dist
-            elif vision_matrix[head_y][x] == 'S':
-                self.state[5 if head_x < x else 7] = dist
-            elif vision_matrix[head_y][x] == 'G':
-                update_state(9 if head_x < x else 11, 13 if head_x < x else 15, dist)
-            elif vision_matrix[head_y][x] == 'R':
-                self.state[17 if head_x < x else 19] = dist
+        for y in range(head_y + 1, len(vision_matrix)):
+            if vision_matrix[y][head_x] == 'W' or vision_matrix[y][head_x] == 'S':
+                self.state[7] = 1
+                break
+            elif vision_matrix[y][head_x] == 'G' or vision_matrix[y][head_x] == 'R':
+                self.state[6] = 1
+                break
+            # elif vision_matrix[y][head_x] == 'R':
+            #     self.state[9] = 1
+            #     break
+            elif vision_matrix[y][head_x] == '0':
+                self.state[8] = 1
 
-        # Check vertically (up-down)
-        for y in range(len(vision_matrix)):
-            dist = abs(head_y - y)
-            if vision_matrix[y][head_x] == 'W':
-                self.state[2 if head_y < y else 0] = dist
-            elif vision_matrix[y][head_x] == 'S':
-                if dist < self.state[6 if head_y < y else 4] or self.state[6 if head_y < y else 4] == 0:
-                    self.state[6 if head_y < y else 4] = dist
-            elif vision_matrix[y][head_x] == 'G':
-                update_state(10 if head_y < y else 8, 14 if head_y < y else 12, dist)
-            elif vision_matrix[y][head_x] == 'R':
-                self.state[18 if head_y < y else 16] = dist
+        for y in range(head_y - 1, -1, -1):
+            if vision_matrix[y][head_x] == 'W' or vision_matrix[y][head_x] == 'S':
+                self.state[10] = 1
+                break
+            elif vision_matrix[y][head_x] == 'G' or vision_matrix[y][head_x] == 'R':
+                self.state[9] = 1
+                break
+            # elif vision_matrix[y][head_x] == 'R':
+            #     self.state[13] = 1
+            #     break
+            elif vision_matrix[y][head_x] == '0':
+                self.state[11] = 1
 
-        if self.direction == pg.Vector2(0, -1):
-            self.state[20] = 1
-        elif self.direction == pg.Vector2(1, 0):
-            self.state[20] = 2
-        elif self.direction == pg.Vector2(0, 1):
-            self.state[20] = 3
-        elif self.direction == pg.Vector2(-1, 0):
-            self.state[20] = 4
-        print(self.state)
+    # def get_state_for_neural(self, vision_matrix):
+    #     head_y = int(self.body[0].y) + 1
+    #     head_x = int(self.body[0].x) + 1
+
+    #     self.state = [0] * 21
+
+    #     # wall distance = 4 / body distance = 4/ good apple 1 et 2 = 8
+    #     # direction = 1 et bad apple =4 donc 21
+    #     def update_state(primary_index, secondary_index, value):
+    #         green_apple_found = False
+    #         for i in range(8, 12):
+    #             if self.state[i] != 0:
+    #                 green_apple_found = True
+    #         if green_apple_found is True:
+    #             self.state[secondary_index] = value
+    #         else:
+    #             self.state[primary_index] = value
+
+    #     # Check horizontally (left-right)
+    #     for x in range(len(vision_matrix[0])):
+    #         dist = abs(head_x - x)
+    #         if vision_matrix[head_y][x] == 'W':
+    #             self.state[1 if head_x < x else 3] = dist
+    #         elif vision_matrix[head_y][x] == 'S':
+    #             self.state[5 if head_x < x else 7] = dist
+    #         elif vision_matrix[head_y][x] == 'G':
+    #             update_state(9 if head_x < x else 11, 13 if head_x < x else 15, dist)
+    #         elif vision_matrix[head_y][x] == 'R':
+    #             self.state[17 if head_x < x else 19] = dist
+
+    #     # Check vertically (up-down)
+    #     for y in range(len(vision_matrix)):
+    #         dist = abs(head_y - y)
+    #         if vision_matrix[y][head_x] == 'W':
+    #             self.state[2 if head_y < y else 0] = dist
+    #         elif vision_matrix[y][head_x] == 'S':
+    #             if dist < self.state[6 if head_y < y else 4] or self.state[6 if head_y < y else 4] == 0:
+    #                 self.state[6 if head_y < y else 4] = dist
+    #         elif vision_matrix[y][head_x] == 'G':
+    #             update_state(10 if head_y < y else 8, 14 if head_y < y else 12, dist)
+    #         elif vision_matrix[y][head_x] == 'R':
+    #             self.state[18 if head_y < y else 16] = dist
+
+    #     if self.direction == pg.Vector2(0, -1):
+    #         self.state[20] = 1
+    #     elif self.direction == pg.Vector2(1, 0):
+    #         self.state[20] = 2
+    #     elif self.direction == pg.Vector2(0, 1):
+    #         self.state[20] = 3
+    #     elif self.direction == pg.Vector2(-1, 0):
+    #         self.state[20] = 4
+    #     print(self.state)

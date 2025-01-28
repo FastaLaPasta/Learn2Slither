@@ -15,13 +15,13 @@ class game():
                                 row * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                         for col in range(0, 10, 2) for row in range(10)]
         self.snake = Snake()
-        self.agent = Agent(self.snake)
         self.greenApples = [GreenApple(self.snake) for i in range(2)]
         self.redApple = RedApple(self.snake, self.greenApples)
         self.occupied = self.greenApples + [self.redApple]
         for apple in self.greenApples:
             apple.get_occupied_tile(self.occupied)
         self.snake.update_vision(self.occupied, self.redApple)
+        self.agent = Agent(self.snake)
 
         # timer
         self.update_event = pg.event.custom_type()
@@ -82,9 +82,9 @@ class game():
 
         if self.snake.body[0] == self.redApple.pos:
             self.snake.has_eaten_red = True
-            self.agent.reward -= 5
+            # self.agent.reward -= 5
             self.redApple.set_pos()
-        self.agent.reward -= 0.5
+        self.agent.reward -= 0.1
 
     def play(self):
         while True:
@@ -100,7 +100,6 @@ class game():
                 if event.type == pg.KEYDOWN and not self.game_active:
                     self.game_active = True
             # drawing
-            
             self.draw_bg()
             self.snake.draw()
             for apple in self.greenApples:
