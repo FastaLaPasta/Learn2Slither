@@ -9,6 +9,7 @@ class Snake:
         self.body = []
         self.direction = pg.Vector2()
 
+        self.vision_matrix = []
         self.has_eaten_green = False
         self.has_eaten_red = False
         self.lose_by_length = False
@@ -78,40 +79,40 @@ class Snake:
                 pg.draw.rect(self.screen, 'blue', rect)
 
     def update_vision(self, occupied, r_apple):
-        vision_matrix = [[" " for column in range(12)] for row in range(12)]
+        self.vision_matrix = [[" " for column in range(12)] for row in range(12)]
         head_y = int(self.body[0].y) + 1
         head_x = int(self.body[0].x) + 1
-        vision_matrix[head_y][head_x] = 'H'
+        self.vision_matrix[head_y][head_x] = 'H'
 
-        vision_matrix[0][head_x] = 'W'
-        vision_matrix[11][head_x] = 'W'
-        vision_matrix[head_y][0] = 'W'
-        vision_matrix[head_y][11] = 'W'
+        self.vision_matrix[0][head_x] = 'W'
+        self.vision_matrix[11][head_x] = 'W'
+        self.vision_matrix[head_y][0] = 'W'
+        self.vision_matrix[head_y][11] = 'W'
 
         for i in range(1, 11):
             if pg.Vector2(i - 1, head_y - 1) != pg.Vector2(head_x - 1, head_y - 1):
-                vision_matrix[head_y][i] = '0'
+                self.vision_matrix[head_y][i] = '0'
                 for apple in occupied:
                     if pg.Vector2(i - 1, head_y - 1) == apple.pos \
                             and apple.pos != r_apple.pos:
-                        vision_matrix[head_y][i] = 'G'
+                        self.vision_matrix[head_y][i] = 'G'
                     elif pg.Vector2(i - 1, head_y - 1) == r_apple.pos:
-                        vision_matrix[head_y][i] = 'R'
+                        self.vision_matrix[head_y][i] = 'R'
                 if pg.Vector2(i - 1, head_y - 1) in self.body:
-                    vision_matrix[head_y][i] = 'S'
+                    self.vision_matrix[head_y][i] = 'S'
             if pg.Vector2(head_x - 1, i - 1) != pg.Vector2(head_x - 1, head_y - 1):
-                vision_matrix[i][head_x] = '0'
+                self.vision_matrix[i][head_x] = '0'
                 for apple in occupied:
                     if pg.Vector2(head_x - 1, i - 1) == apple.pos \
                             and apple.pos != r_apple.pos:
-                        vision_matrix[i][head_x] = 'G'
+                        self.vision_matrix[i][head_x] = 'G'
                     elif pg.Vector2(head_x - 1, i - 1) == r_apple.pos:
-                        vision_matrix[i][head_x] = 'R'
+                        self.vision_matrix[i][head_x] = 'R'
                 if pg.Vector2(head_x - 1, i - 1) in self.body:
-                    vision_matrix[i][head_x] = 'S'
-        self.get_state(vision_matrix)
-        for row in vision_matrix:
-            print("".join(row))
+                    self.vision_matrix[i][head_x] = 'S'
+        # self.get_state()
+        # for row in vision_matrix:
+        #     print("".join(row))
 
     # def update_state(self, r_b, r_end, primary_index, secondary_index, value):
     #     green_apple_found = False
@@ -123,57 +124,57 @@ class Snake:
     #     else:
     #         self.state[primary_index] = value
 
-    def get_state(self, vision_matrix):
+    def get_state(self):
         head_y = int(self.body[0].y) + 1
         head_x = int(self.body[0].x) + 1
         self.state = [0] * 12
 
-        for x in range(head_x + 1, len(vision_matrix[0])):
-            if vision_matrix[head_y][x] == 'W' or vision_matrix[head_y][x] == 'S':
+        for x in range(head_x + 1, len(self.vision_matrix[0])):
+            if self.vision_matrix[head_y][x] == 'W' or self.vision_matrix[head_y][x] == 'S':
                 self.state[1] = 1
                 break
-            elif vision_matrix[head_y][x] == 'G' or vision_matrix[head_y][x] == 'R':
+            elif self.vision_matrix[head_y][x] == 'G' or self.vision_matrix[head_y][x] == 'R':
                 self.state[0] = 1
                 break
-            elif vision_matrix[head_y][x] == '0':
+            elif self.vision_matrix[head_y][x] == '0':
                 self.state[2] = 1
 
         for x in range(head_x - 1, -1, -1):
-            if vision_matrix[head_y][x] == 'W' or vision_matrix[head_y][x] == 'S':
+            if self.vision_matrix[head_y][x] == 'W' or self.vision_matrix[head_y][x] == 'S':
                 self.state[4] = 1
                 break
-            elif vision_matrix[head_y][x] == 'G' or vision_matrix[head_y][x] == 'R':
+            elif self.vision_matrix[head_y][x] == 'G' or self.vision_matrix[head_y][x] == 'R':
                 self.state[3] = 1
                 break
-            elif vision_matrix[head_y][x] == '0':
+            elif self.vision_matrix[head_y][x] == '0':
                 self.state[5] = 1
 
-        for y in range(head_y + 1, len(vision_matrix)):
-            if vision_matrix[y][head_x] == 'W' or vision_matrix[y][head_x] == 'S':
+        for y in range(head_y + 1, len(self.vision_matrix)):
+            if self.vision_matrix[y][head_x] == 'W' or self.vision_matrix[y][head_x] == 'S':
                 self.state[7] = 1
                 break
-            elif vision_matrix[y][head_x] == 'G' or vision_matrix[y][head_x] == 'R':
+            elif self.vision_matrix[y][head_x] == 'G' or self.vision_matrix[y][head_x] == 'R':
                 self.state[6] = 1
                 break
             # elif vision_matrix[y][head_x] == 'R':
             #     self.state[9] = 1
             #     break
-            elif vision_matrix[y][head_x] == '0':
+            elif self.vision_matrix[y][head_x] == '0':
                 self.state[8] = 1
 
         for y in range(head_y - 1, -1, -1):
-            if vision_matrix[y][head_x] == 'W' or vision_matrix[y][head_x] == 'S':
+            if self.vision_matrix[y][head_x] == 'W' or self.vision_matrix[y][head_x] == 'S':
                 self.state[10] = 1
                 break
-            elif vision_matrix[y][head_x] == 'G' or vision_matrix[y][head_x] == 'R':
+            elif self.vision_matrix[y][head_x] == 'G' or self.vision_matrix[y][head_x] == 'R':
                 self.state[9] = 1
                 break
             # elif vision_matrix[y][head_x] == 'R':
             #     self.state[13] = 1
             #     break
-            elif vision_matrix[y][head_x] == '0':
+            elif self.vision_matrix[y][head_x] == '0':
                 self.state[11] = 1
-
+        return self.state
     # def get_state_for_neural(self, vision_matrix):
     #     head_y = int(self.body[0].y) + 1
     #     head_x = int(self.body[0].x) + 1
